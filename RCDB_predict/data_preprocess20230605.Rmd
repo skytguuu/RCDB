@@ -1,0 +1,110 @@
+---
+title: ''
+output: html_document
+date: "2023-06-04"
+---
+
+```{r setup, include=FALSE}
+##NAME?-NA
+#INF-NA
+#gmin-all NA
+library(dplyr)
+res1 = read.csv("G:/cooperate/yuedi/model255_input_Inf.csv",header = TRUE,stringsAsFactors = FALSE)
+dim(res1)
+table(res1$y)
+length(table(res1$GOID))
+length(table(res1$CID))
+file1 = res1
+same = c()
+#features with 0 for all samples were deleted
+for (c in 1:dim(file1)[2]){
+  same = append(same, all(na.omit(file1[, c])==0))  
+  file1[is.na(file1[, c]), c] = median(as.numeric(na.omit(file1[, c])))
+}
+sum(same)  #573
+file_omit_0 = file1[, same==FALSE]  #[1020 1811]
+file_scale = file_omit_0
+for (c in 4:dim(file_omit_0)[2]){
+  # print(c)
+  file_scale[, c] = scale(file_omit_0[, c], center = TRUE, scale = TRUE)
+}
+file_scale$y = file_omit_0$y
+file_scale <- select(file_scale,-gmin)
+write.table(file_scale, 'G:/cooperate/yuedi/model255_input_dataclean.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+print(dim(file_scale))
+
+#extract xgboost important features
+features_file = read.csv("G:/cooperate/yuedi/model255_feat_importance_all.csv",header = TRUE,stringsAsFactors = FALSE)
+features = unique(features_file$X)
+features = append(features[-which(features=="")], c('GOID', 'CID', 'Pairs', 'y'))
+file_scale_used = file_scale[, features]
+write.table(file_scale_used, 'G:/cooperate/yuedi/model255_input_dataclean_features.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+```
+
+
+```{r setup, include=FALSE}
+##NAME?-NA
+#INF-NA
+#-NA-NA
+res1 = read.csv("G:/cooperate/yuedi/model255_simi_input_Inf.csv",header = TRUE,stringsAsFactors = FALSE)
+dim(res1)
+table(res1$y)
+length(table(res1$GOID))
+length(table(res1$CID))
+file1 = res1
+same = c()
+#features with 0 for all samples were deleted
+for (c in 1:dim(file1)[2]){
+  same = append(same, all(na.omit(file1[, c])==0))  
+  file1[is.na(file1[, c]), c] = median(as.numeric(na.omit(file1[, c])))
+}
+sum(same)  #573
+file_omit_0 = file1[, same==FALSE]  #[1020 1811]
+file_scale = file_omit_0
+for (c in 4:dim(file_omit_0)[2]){
+  # print(c)
+  file_scale[, c] = scale(file_omit_0[, c], center = TRUE, scale = TRUE)
+}
+file_scale$y = file_omit_0$y
+file_scale <- select(file_scale,-gmin)
+write.table(file_scale, 'G:/cooperate/yuedi/model255_simi_input_dataclean.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+print(dim(file_scale))
+
+#extract xgboost important features
+features_file = read.csv("G:/cooperate/yuedi/model255_simi_feat_importance_all.csv",header = TRUE,stringsAsFactors = FALSE)
+features = unique(features_file$X)
+features = append(features[-which(features=="")], c('GOID', 'CID', 'Pairs', 'y'))
+file_scale_used = file_scale[, features]
+write.table(file_scale_used, 'G:/cooperate/yuedi/model255_simi_input_dataclean_features.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+```
+
+
+```{r}
+res1 = read.csv("pubchem10000_model_input.csv",header = TRUE,stringsAsFactors = FALSE)
+dim(res1)
+table(res1$y)
+length(table(res1$GOID))
+length(table(res1$CID))
+file1 = res1
+same = c()
+for (c in 1:dim(file1)[2]){
+  same = append(same, all(na.omit(file1[, c])==0))  
+  file1[is.na(file1[, c]), c] = median(as.numeric(na.omit(file1[, c])))
+}
+sum(same)  #432
+file_omit_0 = file1[, same==FALSE]  #[1020 1811]
+file_scale = file_omit_0
+for (c in 4:dim(file_omit_0)[2]){
+  # print(c)
+  file_scale[, c] = scale(file_omit_0[, c], center = TRUE, scale = TRUE)
+}
+file_scale$y = file_omit_0$y
+# file_scale <- select(file_scale,-gmin)
+write.table(file_scale, 'G:/cooperate/yuedi/pubchem10000_model_input_dataclean.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+print(dim(file_scale))
+#extract xgboost important features
+data = read.table('G:/cooperate/yuedi/model255_simi_input_dataclean_features.txt', header = TRUE, sep='\t')
+file_scale_used = file_scale[, names(data)[1:187]]
+write.table(file_scale_used, 'G:/cooperate/yuedi/pubchem10000_model_input_dataclean_features.txt', col.name= TRUE, row.names = FALSE, quote = FALSE,  sep='\t')
+```
+
